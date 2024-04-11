@@ -10,65 +10,59 @@ import RealityKit
 import RealityKitContent
 
 struct ContentView: View {
-
-    @State private var enlarge = false
-    @State private var showImmersiveSpace = false
-    @State private var immersiveSpaceIsShown = false
-
-    @Environment(\.openImmersiveSpace) var openImmersiveSpace
-    @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
-
+    @State var cameraRotation: Angle = .zero
+    @State var bottleRotation: Angle = .zero
+    @State var camera = Entity()
+    @State var bottle = Entity()
+    
     var body: some View {
-        VStack {
-            RealityView { content in
-                // Add the initial RealityKit content
-                if let scene = try? await Entity(named: "Scene", in: realityKitContentBundle) {
-                    content.add(scene)
-                }
-            } update: { content in
-                // Update the RealityKit content when SwiftUI state changes
-                if let scene = content.entities.first {
-                    let uniformScale: Float = enlarge ? 1.4 : 1.0
-                    scene.transform.scale = [uniformScale, uniformScale, uniformScale]
-                }
+        RealityView { content in
+            if let scene = try? await Entity(named: "Scene",
+                                                in: realityKitContentBundle) {
+                content.add(scene)
+                print(scene)
             }
-            .gesture(TapGesture().targetedToAnyEntity().onEnded { _ in
-                enlarge.toggle()
-            })
+        } update: { content in
+            if let scene = content.entities.first {
+                Task {
+                    camera = scene.findEntity(named: "camera") ?? Entity()
+                    camera.components.set(InputTargetComponent())
+                    camera.generateCollisionShapes(recursive: false)
 
-            VStack (spacing: 12) {
-                Toggle("Enlarge RealityView Content", isOn: $enlarge)
-                    .font(.title)
-
-                Toggle("Show ImmersiveSpace", isOn: $showImmersiveSpace)
-                    .font(.title)
-            }
-            .frame(width: 360)
-            .padding(36)
-            .glassBackgroundEffect()
-
-        }
-        .onChange(of: showImmersiveSpace) { _, newValue in
-            Task {
-                if newValue {
-                    switch await openImmersiveSpace(id: "ImmersiveSpace") {
-                    case .opened:
-                        immersiveSpaceIsShown = true
-                    case .error, .userCancelled:
-                        fallthrough
-                    @unknown default:
-                        immersiveSpaceIsShown = false
-                        showImmersiveSpace = false
-                    }
-                } else if immersiveSpaceIsShown {
-                    await dismissImmersiveSpace()
-                    immersiveSpaceIsShown = false
+                    bottle = scene.findEntity(named: "bottle") ?? Entity()
+                    bottle.components.set(InputTargetComponent())
+                    bottle.generateCollisionShapes(recursive: false)
                 }
             }
         }
+        .gesture(
+            DragGesture()
+                .targetedToEntity(camera)
+                .onChanged { _ in
+                    cameraRotation.degrees += 5.0
+                    let m1 = Transform(pitch: Float(cameraRotation.radians)).matrix
+                    let m2 = Transform(yaw: Float(cameraRotation.radians)).matrix
+                    camera.transform.matrix = matrix_multiply(m1, m2)
+                    // Keep starting distance between models
+                    camera.position.x = -0.25
+                }
+        )
+        .gesture(
+            TapGesture()
+                .targetedToEntity(camera)
+                .onEnded { _ in
+                    debugPrint("Camera clicked")
+                }
+        )
+        .gesture(
+            DragGesture()
+                .targetedToEntity(bottle)
+                .onChanged { _ in
+                    bottleRotation.degrees += 5.0
+                    bottle.transform = Transform(roll: Float(bottleRotation.radians))
+                    // Keep starting distance between models
+                    bottle.position.x = 0.25
+                }
+        )
     }
-}
-
-#Preview(windowStyle: .volumetric) {
-    ContentView()
 }
