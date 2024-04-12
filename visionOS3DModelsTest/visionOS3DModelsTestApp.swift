@@ -9,13 +9,22 @@ import SwiftUI
 
 @main
 struct visionOS3DModelsTestApp: App {
+    
+    @StateObject var navigation = Navigation()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                ListView()
+                    .environmentObject(navigation)
+            }
         }.windowStyle(.volumetric)
 
-        ImmersiveSpace(id: "ImmersiveSpace") {
-            ImmersiveView()
+        WindowGroup(id: "item") {
+            ItemView()
+                .environmentObject(navigation)
         }
+        .windowStyle(.volumetric)
+        .defaultSize(width: 0.5, height: 0.5, depth: 0.5, in: .meters)
     }
 }
