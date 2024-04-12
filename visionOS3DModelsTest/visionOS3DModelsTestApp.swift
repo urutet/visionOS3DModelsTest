@@ -25,6 +25,6 @@ struct visionOS3DModelsTestApp: App {
                 .environmentObject(navigation)
         }
         .windowStyle(.volumetric)
-        .defaultSize(width: 0.5, height: 0.5, depth: 0.5, in: .meters)
+        .defaultSize(width: 1, height: 1, depth: 1, in: .meters)
     }
 }

@@ -34,6 +34,8 @@ struct ItemView: View {
                     return
                 }
                 content.entities.removeAll()
+                entity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                entity.generateCollisionShapes(recursive: true)
                 content.add(entity)
             }
         }
@@ -71,7 +73,6 @@ struct ItemView: View {
                     startScale = scale
                 }
         )
-        .zIndex(1)
         .onAppear {
             viewModel.item = navigation.selectedItem
             viewModel.getEntity()
