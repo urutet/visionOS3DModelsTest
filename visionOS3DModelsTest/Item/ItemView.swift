@@ -62,6 +62,7 @@ struct ItemView: View {
                 })
         .simultaneousGesture(
             MagnifyGesture()
+                .targetedToAnyEntity()
                 .onChanged { value in
                     if let startScale {
                         scale = max(1, min(3, value.magnification * startScale))
@@ -76,6 +77,7 @@ struct ItemView: View {
         .onAppear {
             viewModel.item = navigation.selectedItem
             viewModel.getEntity()
+            
         }
     }
 }

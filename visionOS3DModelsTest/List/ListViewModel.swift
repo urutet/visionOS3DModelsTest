@@ -15,6 +15,7 @@ class ListViewModel: ObservableObject {
             InventoryItem(name: "DslrCamera"),
             InventoryItem(name: "MagnifyingGlass"),
             InventoryItem(name: "Drummer"),
+            InventoryItem(name: "Camera"),
         ]
     }
 }

@@ -23,6 +23,7 @@
 		E846DA3A2BC9300200C217C1 /* Drummer.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA372BC9300200C217C1 /* Drummer.usdz */; };
 		E846DA3B2BC9300200C217C1 /* DslrCamera.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA382BC9300200C217C1 /* DslrCamera.usdz */; };
 		E846DA3C2BC9300200C217C1 /* MagnifyingGlass.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */; };
+		E846DA422BCD4A7100C217C1 /* Camera.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA412BCD4A7100C217C1 /* Camera.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		E846DA372BC9300200C217C1 /* Drummer.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Drummer.usdz; sourceTree = "<group>"; };
 		E846DA382BC9300200C217C1 /* DslrCamera.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = DslrCamera.usdz; sourceTree = "<group>"; };
 		E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = MagnifyingGlass.usdz; sourceTree = "<group>"; };
+		E846DA412BCD4A7100C217C1 /* Camera.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Camera.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +149,7 @@
 		E846DA362BC92F0900C217C1 /* USDZ */ = {
 			isa = PBXGroup;
 			children = (
+				E846DA412BCD4A7100C217C1 /* Camera.usdz */,
 				E846DA372BC9300200C217C1 /* Drummer.usdz */,
 				E846DA382BC9300200C217C1 /* DslrCamera.usdz */,
 				E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */,
@@ -219,6 +222,7 @@
 				E846DA3B2BC9300200C217C1 /* DslrCamera.usdz in Resources */,
 				E846DA3C2BC9300200C217C1 /* MagnifyingGlass.usdz in Resources */,
 				E846DA3A2BC9300200C217C1 /* Drummer.usdz in Resources */,
+				E846DA422BCD4A7100C217C1 /* Camera.usdz in Resources */,
 				E846DA0D2BC7CE6000C217C1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

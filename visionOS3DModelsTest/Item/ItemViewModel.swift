@@ -10,12 +10,19 @@ import RealityKit
 
 class ItemViewModel: ObservableObject {
     @Published var item: InventoryItem?
-    @Published var entity: ModelEntity?
+    @Published var entity: Entity?
     
     func getEntity() {
         guard let item else { return }
         Task { @MainActor in
-            entity = try await ModelEntity(named: item.name)
+            entity = try await Entity(named: item.name)
+            playAnimation()
+        }
+    }
+    
+    func playAnimation() {
+        if let animation = entity?.availableAnimations.first {
+            entity?.playAnimation(animation)
         }
     }
 }
