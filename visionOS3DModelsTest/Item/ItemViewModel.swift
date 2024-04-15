@@ -10,6 +10,9 @@ import RealityKit
 
 class ItemViewModel: ObservableObject {
     @Published var item: InventoryItem?
+
+    // Make sure entity is `Entity` class. Animations don't work with
+    // ModelEntity subclass
     @Published var entity: Entity?
     
     func getEntity() {
@@ -22,6 +25,7 @@ class ItemViewModel: ObservableObject {
     
     func playAnimation() {
         if let animation = entity?.availableAnimations.first {
+            // use animation.repeat() to repeat enimation indefinetly
             entity?.playAnimation(animation)
         }
     }
