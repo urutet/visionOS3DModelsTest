@@ -11,13 +11,11 @@ import RealityKit
 struct ListItemView: View {
     let item: InventoryItem
     
-    @EnvironmentObject var navigation: Navigation
     @Environment(\.openWindow) var openWindow
     
     var body: some View {
         Button {
-            navigation.selectedItem = item
-            openWindow(id: "item")
+            openWindow(value: item)
         } label: {
             VStack {
                 Model3D(named: item.name) { phase in

@@ -9,20 +9,20 @@ import SwiftUI
 
 @main
 struct visionOS3DModelsTestApp: App {
-    
-    @StateObject var navigation = Navigation()
-    
+        
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 ListView()
-                    .environmentObject(navigation)
             }
         }.windowStyle(.volumetric)
 
-        WindowGroup(id: "item") {
-            ItemView()
-                .environmentObject(navigation)
+        WindowGroup(for: InventoryItem.self) { item in
+            if let item = item.wrappedValue {
+                ItemView(viewModel: ItemViewModel(item: item))
+            } else {
+                EmptyView()
+            }
         }
         .windowStyle(.volumetric)
         .defaultSize(width: 1, height: 1, depth: 1, in: .meters)

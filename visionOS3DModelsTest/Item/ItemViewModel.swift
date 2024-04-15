@@ -9,14 +9,14 @@ import Foundation
 import RealityKit
 
 class ItemViewModel: ObservableObject {
-    @Published var item: InventoryItem?
+    @Published var item: InventoryItem
 
     // Make sure entity is `Entity` class. Animations don't work with
     // ModelEntity subclass
     @Published var entity: Entity?
     
-    func getEntity() {
-        guard let item else { return }
+    init(item: InventoryItem) {
+        self.item = item
         Task { @MainActor in
             entity = try await Entity(named: item.name)
             playAnimation()

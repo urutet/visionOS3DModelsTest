@@ -9,9 +9,8 @@ import RealityKit
 import SwiftUI
 
 struct ItemView: View {
-    @EnvironmentObject var navigation: Navigation
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = ItemViewModel()
+    @StateObject var viewModel: ItemViewModel
     
     // Rotations
     @State var angle: Angle = .degrees(0)
@@ -74,10 +73,5 @@ struct ItemView: View {
                     startScale = scale
                 }
         )
-        .onAppear {
-            viewModel.item = navigation.selectedItem
-            viewModel.getEntity()
-            
-        }
     }
 }
