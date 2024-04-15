@@ -25,7 +25,6 @@ struct visionOS3DModelsTestApp: App {
                 EmptyView()
             }
         }
-        .windowStyle(.volumetric)
-        .defaultSize(width: 1, height: 1, depth: 1, in: .meters)
+        .windowStyle(.plain)
     }
 }
