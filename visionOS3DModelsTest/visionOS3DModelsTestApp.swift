@@ -15,7 +15,8 @@ struct visionOS3DModelsTestApp: App {
             NavigationStack {
                 ListView()
             }
-        }.windowStyle(.volumetric)
+        }
+        .windowStyle(.volumetric)
 
         WindowGroup(for: InventoryItem.self) { item in
             if let item = item.wrappedValue {

@@ -13,13 +13,19 @@ class ItemViewModel: ObservableObject {
 
     // Make sure entity is `Entity` class. Animations don't work with
     // ModelEntity subclass
-    @Published var entity: Entity?
+    @Published var entity: Entity? {
+        didSet {
+            guard let entity else { return }
+            isAnimationAvailable = !entity.availableAnimations.isEmpty
+        }
+    }
+
+    @Published var isAnimationAvailable: Bool = false
     
     init(item: InventoryItem) {
         self.item = item
         Task { @MainActor in
             entity = try await Entity(named: item.name)
-            playAnimation()
         }
     }
     

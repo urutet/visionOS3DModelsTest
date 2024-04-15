@@ -21,57 +21,66 @@ struct ItemView: View {
     @State var startScale: Double?
     
     var body: some View {
-        RealityView { _ in
-            
-        } update: { content in
-            if viewModel.entity == nil && !content.entities.isEmpty {
-                content.entities.removeAll()
-            }
-            
-            if let entity = viewModel.entity {
-                if let currentEntity = content.entities.first, entity == currentEntity {
-                    return
+        VStack {
+            RealityView { _ in
+                
+            } update: { content in
+                if viewModel.entity == nil && !content.entities.isEmpty {
+                    content.entities.removeAll()
                 }
-                content.entities.removeAll()
-                entity.components.set(InputTargetComponent(allowedInputTypes: .all))
-                entity.generateCollisionShapes(recursive: true)
-                content.add(entity)
+                
+                if let entity = viewModel.entity {
+                    if let currentEntity = content.entities.first, entity == currentEntity {
+                        return
+                    }
+                    content.entities.removeAll()
+                    entity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                    entity.generateCollisionShapes(recursive: true)
+                    content.add(entity)
+                }
             }
-        }
-        .rotation3DEffect(angle, axis: axis)
-        .scaleEffect(scale)
-        .simultaneousGesture(
-            DragGesture()
-                .onChanged { value in
-                    if let startAngle, let startAxis {
-                        let _angle = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2)) + startAngle.degrees
-                        let axisX = ((-value.translation.height + startAxis.0) / CGFloat(_angle))
-                        let axisY = ((-value.translation.width + startAxis.1) / CGFloat(_angle))
-                        angle = Angle(degrees: Double(_angle))
-                        axis = (axisX, axisY, 0)
-                    } else {
+            .rotation3DEffect(angle, axis: axis)
+            .scaleEffect(scale)
+            .simultaneousGesture(
+                DragGesture()
+                    .onChanged { value in
+                        if let startAngle, let startAxis {
+                            let _angle = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2)) + startAngle.degrees
+                            let axisX = ((-value.translation.height + startAxis.0) / CGFloat(_angle))
+                            let axisY = ((-value.translation.width + startAxis.1) / CGFloat(_angle))
+                            angle = Angle(degrees: Double(_angle))
+                            axis = (axisX, axisY, 0)
+                        } else {
+                            startAngle = angle
+                            startAxis = axis
+                        }
+                        
+                    }
+                    .onEnded { value in
                         startAngle = angle
                         startAxis = axis
+                    })
+            .simultaneousGesture(
+                MagnifyGesture()
+                    .targetedToAnyEntity()
+                    .onChanged { value in
+                        if let startScale {
+                            scale = max(1, min(3, value.magnification * startScale))
+                        } else {
+                            startScale = scale
+                        }
                     }
-                    
-                }
-                .onEnded { value in
-                    startAngle = angle
-                    startAxis = axis
-                })
-        .simultaneousGesture(
-            MagnifyGesture()
-                .targetedToAnyEntity()
-                .onChanged { value in
-                    if let startScale {
-                        scale = max(1, min(3, value.magnification * startScale))
-                    } else {
+                    .onEnded { _ in
                         startScale = scale
                     }
-                }
-                .onEnded { _ in
-                    startScale = scale
-                }
-        )
+            )
+            
+            Button(action: {
+                viewModel.playAnimation()
+            }, label: {
+                Text("Play Animation")
+            })
+            .disabled(!viewModel.isAnimationAvailable)
+        }
     }
 }
