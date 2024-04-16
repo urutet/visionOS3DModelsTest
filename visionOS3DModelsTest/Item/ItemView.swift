@@ -100,7 +100,7 @@ struct ItemView: View {
             Button(action: {
                 viewModel.resetAnimation()
             }, label: {
-                Text("Reset")
+                Text("Assemble")
             })
             .disabled(!viewModel.isAnimationAvailable)
         }
