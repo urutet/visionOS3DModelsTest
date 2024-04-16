@@ -47,6 +47,10 @@ struct ItemView: View {
                         entity.components.set(InputTargetComponent(allowedInputTypes: .all))
                         entity.generateCollisionShapes(recursive: true)
                         content.add(entity)
+                        debugPrint("ENTITY CHILDREN: ")
+                        entity.children.forEach { child in
+                            debugPrint(child)
+                        }
                     }
                 }
                 .rotation3DEffect(angle, axis: axis)
@@ -90,6 +94,13 @@ struct ItemView: View {
                 viewModel.playAnimation()
             }, label: {
                 Text("Disassemble")
+            })
+            .disabled(!viewModel.isAnimationAvailable)
+            
+            Button(action: {
+                viewModel.resetAnimation()
+            }, label: {
+                Text("Reset")
             })
             .disabled(!viewModel.isAnimationAvailable)
         }
