@@ -17,6 +17,7 @@ struct visionOS3DModelsTestApp: App {
             }
         }
         .windowStyle(.volumetric)
+        .defaultSize(width: 1, height: 1, depth: 0.1, in: .meters)
 
         WindowGroup(for: InventoryItem.self) { item in
             if let item = item.wrappedValue {

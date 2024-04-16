@@ -12,11 +12,14 @@ struct ItemView: View {
     @StateObject var viewModel: ItemViewModel
     
     // Rotations
+    
+    // - TODO: Refactor to incapsulate these properties in component
+    // `https://developer.apple.com/documentation/realitykit/transforming-realitykit-entities-with-gestures?changes=_8`
     @State var angle: Angle = .degrees(0)
     @State var startAngle: Angle?
     @State var axis: (CGFloat, CGFloat, CGFloat) = (.zero, .zero, .zero)
     @State var startAxis: (CGFloat, CGFloat, CGFloat)?
-    @State var scale: Double = 2
+    @State var scale: Double = 1
     @State var startScale: Double?
     
     var body: some View {
@@ -47,10 +50,6 @@ struct ItemView: View {
                         entity.components.set(InputTargetComponent(allowedInputTypes: .all))
                         entity.generateCollisionShapes(recursive: true)
                         content.add(entity)
-                        debugPrint("ENTITY CHILDREN: ")
-                        entity.children.forEach { child in
-                            debugPrint(child)
-                        }
                     }
                 }
                 .rotation3DEffect(angle, axis: axis)
@@ -86,6 +85,13 @@ struct ItemView: View {
                         }
                         .onEnded { _ in
                             startScale = scale
+                        }
+                )
+                .simultaneousGesture(
+                    TapGesture()
+                        .targetedToAnyEntity()
+                        .onEnded { value in
+                            debugPrint(value.entity)
                         }
                 )
             }

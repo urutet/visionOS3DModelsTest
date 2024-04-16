@@ -19,6 +19,8 @@ class ItemViewModel: ObservableObject {
             isAnimationAvailable = !entity.availableAnimations.isEmpty
         }
     }
+    
+    var selectedChild: Entity?
 
     @Published var isAnimationAvailable: Bool = false
     
