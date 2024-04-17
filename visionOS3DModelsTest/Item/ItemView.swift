@@ -21,6 +21,14 @@ struct ItemView: View {
     @State var startAxis: (CGFloat, CGFloat, CGFloat)?
     @State var scale: Double = 1
     @State var startScale: Double?
+    @State var entity: Entity? {
+        didSet {
+            guard let entity else { return }
+            isAnimationAvailable = !entity.availableAnimations.isEmpty
+        }
+    }
+
+    @State var isAnimationAvailable: Bool = false
     
     var body: some View {
         VStack {
@@ -35,22 +43,17 @@ struct ItemView: View {
                 }
                 .glassBackgroundEffect(displayMode: .always)
 
-                RealityView { _ in
-                    
-                } update: { content in
-                    if viewModel.entity == nil && !content.entities.isEmpty {
-                        content.entities.removeAll()
-                    }
-                    
-                    if let entity = viewModel.entity {
-                        if let currentEntity = content.entities.first, entity == currentEntity {
-                            return
-                        }
-                        content.entities.removeAll()
-                        entity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                RealityView { content in
+                    do {
+                        entity = try await Entity(named: viewModel.item.name)
+                        guard let entity else { return }
                         entity.generateCollisionShapes(recursive: true)
+                        entity.components.set(InputTargetComponent(allowedInputTypes: .all))
                         content.add(entity)
+                    } catch {
+                        debugPrint(error)
                     }
+
                 }
                 .rotation3DEffect(angle, axis: axis)
                 .scaleEffect(scale)
@@ -97,18 +100,39 @@ struct ItemView: View {
             }
             
             Button(action: {
-                viewModel.playAnimation()
+                playAnimation()
             }, label: {
                 Text("Disassemble")
             })
-            .disabled(!viewModel.isAnimationAvailable)
+            .disabled(!isAnimationAvailable)
             
             Button(action: {
-                viewModel.resetAnimation()
+                resetAnimation()
             }, label: {
                 Text("Assemble")
             })
-            .disabled(!viewModel.isAnimationAvailable)
+            .disabled(!isAnimationAvailable)
+        }
+    }
+    
+    private func playAnimation() {
+        if let animation = entity?.availableAnimations.first {
+            // use animation.repeat() to repeat enimation indefinetly
+            entity?.playAnimation(animation)
+        }
+    }
+    
+    private func resetAnimation() {
+        if let animation = entity?.availableAnimations.first {
+            var reversedDefinition = animation.definition
+            reversedDefinition.speed = -1
+            
+            do {
+                let reversedAnimation = try AnimationResource.generate(with: reversedDefinition)
+                entity?.playAnimation(reversedAnimation)
+            } catch {
+                debugPrint(error)
+            }
         }
     }
 }
