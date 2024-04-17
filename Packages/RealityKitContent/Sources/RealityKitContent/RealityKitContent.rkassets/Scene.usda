@@ -9,68 +9,54 @@ reorder rootPrims = ["Root", "GridMaterial"]
 
 def Xform "Root"
 {
-    reorder nameChildren = ["camera", "bottle"]
+    reorder nameChildren = ["box", "bottle"]
     rel material:binding = None (
         bindMaterialAs = "weakerThanDescendants"
     )
 
-    def Cube "camera" (
+    def "Camera" (
         active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
+        customData = {
+            float3 rotationEulerHint = (-1.5707964, 0, 0)
+        }
+        prepend references = @Camera.usdz@
     )
     {
-        rel material:binding = </Root/camera/DefaultMaterial>
-        double size = 0.2
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (-0.067076966, 1.4901161e-8, -0.029625088)
+        quatf xformOp:orient = (0.70710677, -0.70710677, 0, 0)
+        float3 xformOp:scale = (0.1, 0.1, 0.1)
+        float3 xformOp:translate = (0, 0, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
 
-        def Material "DefaultMaterial"
+        def RealityKitComponent "InputTarget"
         {
-            token outputs:mtlx:surface
-            token outputs:realitykit:vertex
-            prepend token outputs:surface.connect = </Root/camera/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+            uniform token info:id = "RealityKit.InputTarget"
+        }
 
-            def Shader "DefaultSurfaceShader"
+        def RealityKitComponent "Collider"
+        {
+            uint group = 1
+            uniform token info:id = "RealityKit.Collider"
+            uint mask = 4294967295
+            token type = "Default"
+
+            def RealityKitStruct "Shape"
             {
-                uniform token info:id = "UsdPreviewSurface"
-                color3f inputs:diffuseColor = (1, 0.5439476, 0.43856373) (
-                    colorSpace = "srgb_displayp3"
-                )
-                float inputs:roughness = 0.75
-                token outputs:surface
+                float3 extent = (0.81737566, 0.33617753, 0.4552975)
+                token shapeType = "Box"
+
+                def RealityKitStruct "pose"
+                {
+                    float3 position = (-0.080993, -0.059458442, 0.23256417)
+                }
             }
         }
-    }
 
-    def Cube "bottle" (
-        active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
-    )
-    {
-        rel material:binding = </Root/bottle/DefaultMaterial>
-        double size = 0.2
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0.23980092, 0, -0.022988714)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-
-        def Material "DefaultMaterial"
+        def RealityKitCustomComponent "RealityKitContent_GestureComponent"
         {
-            token outputs:mtlx:surface
-            token outputs:realitykit:vertex
-            token outputs:surface.connect = </Root/bottle/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
-
-            def Shader "DefaultSurfaceShader"
-            {
-                uniform token info:id = "UsdPreviewSurface"
-                color3f inputs:diffuseColor = (1, 0.8530083, 0.5145314) (
-                    colorSpace = "srgb_displayp3"
-                )
-                float inputs:roughness = 0.75
-                token outputs:surface
-            }
+            bool canRotate = 1
+            bool canScale = 1
+            uniform token info:id = "RealityKitContent.GestureComponent"
+            bool preserveOrientationOnPivotDrag = 0
         }
     }
 }
