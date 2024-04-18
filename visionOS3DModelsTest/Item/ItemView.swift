@@ -12,8 +12,6 @@ import SwiftUI
 struct ItemView: View {
     @StateObject var viewModel: ItemViewModel
     
-    @Environment(\.openWindow) var openWindow
-    
     // Rotations
     
     // - TODO: Refactor to incapsulate these properties in component
@@ -45,7 +43,7 @@ struct ItemView: View {
         VStack {
             HStack {
                 VStack {
-                    Text(viewModel.item.name)
+                    Text(selectedEntity?.name ?? "")
                         .font(.largeTitle)
                         .padding()
                     
