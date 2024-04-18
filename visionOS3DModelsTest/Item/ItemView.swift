@@ -12,6 +12,8 @@ import SwiftUI
 struct ItemView: View {
     @StateObject var viewModel: ItemViewModel
     
+    @Environment(\.openWindow) var openWindow
+    
     // Rotations
     
     // - TODO: Refactor to incapsulate these properties in component
@@ -28,8 +30,16 @@ struct ItemView: View {
             isAnimationAvailable = !entity.availableAnimations.isEmpty
         }
     }
+    
+    @State var selectedEntity: Entity? {
+        didSet {
+            isBackAvailable = entity != selectedEntity
+        }
+    }
 
     @State var isAnimationAvailable: Bool = false
+    
+    @State var isBackAvailable: Bool = false
     
     var body: some View {
         VStack {
@@ -47,6 +57,7 @@ struct ItemView: View {
                 RealityView { content in
                     do {
                         entity = try await Entity(named: viewModel.item.name)
+                        selectedEntity = entity
                         guard let entity else { return }
                         entity.generateCollisionShapes(recursive: true)
                         entity.components.set(InputTargetComponent(allowedInputTypes: .all))
@@ -55,6 +66,18 @@ struct ItemView: View {
                         debugPrint(error)
                     }
 
+                } update: { content in
+                    guard let selectedEntity, selectedEntity != entity else {
+                        content.entities.removeAll()
+                        guard let entity else { return }
+                        content.add(entity)
+                        entity.isEnabled = true
+                        return
+                    }
+                    selectedEntity.generateCollisionShapes(recursive: true)
+                    selectedEntity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                    content.add(selectedEntity)
+                    entity?.isEnabled = false
                 }
                 .rotation3DEffect(angle, axis: axis)
                 .scaleEffect(scale)
@@ -96,6 +119,7 @@ struct ItemView: View {
                         .targetedToAnyEntity()
                         .onEnded { value in
                             debugPrint(value.entity)
+                            selectedEntity = value.entity.clone(recursive: true)
                         }
                 )
             }
@@ -113,6 +137,13 @@ struct ItemView: View {
                 Text("Assemble")
             })
             .disabled(!isAnimationAvailable)
+            
+            Button(action: {
+                resetScene()
+            }, label: {
+                Text("Back")
+            })
+            .disabled(!isBackAvailable)
         }
     }
     
@@ -135,5 +166,9 @@ struct ItemView: View {
                 debugPrint(error)
             }
         }
+    }
+    
+    private func resetScene() {
+        selectedEntity = entity
     }
 }

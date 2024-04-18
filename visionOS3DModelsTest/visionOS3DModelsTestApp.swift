@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct visionOS3DModelsTestApp: App {
-        
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
@@ -18,7 +18,7 @@ struct visionOS3DModelsTestApp: App {
         }
         .windowStyle(.volumetric)
         .defaultSize(width: 1, height: 1, depth: 0.1, in: .meters)
-
+        
         WindowGroup(for: InventoryItem.self) { item in
             if let item = item.wrappedValue {
                 ItemView(viewModel: ItemViewModel(item: item))
