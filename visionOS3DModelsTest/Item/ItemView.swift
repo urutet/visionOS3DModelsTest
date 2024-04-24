@@ -9,6 +9,10 @@ import RealityKit
 import RealityKitContent
 import SwiftUI
 
+private enum Constants {
+    static let maxScale = 4.0
+}
+
 struct ItemView: View {
     @StateObject var viewModel: ItemViewModel
     
@@ -40,109 +44,119 @@ struct ItemView: View {
     @State var isBackAvailable: Bool = false
     
     var body: some View {
-        VStack {
-            HStack {
-                VStack {
-                    Text(selectedEntity?.name ?? "")
-                        .font(.largeTitle)
-                        .padding()
+        // Use GeometryReader3D to get window size and scale entity to avoid clipping
+        GeometryReader { proxy in
+            VStack {
+                HStack {
+                    VStack {
+                        Text(selectedEntity?.name ?? "")
+                            .font(.largeTitle)
+                            .padding()
+                        
+                        Text(viewModel.item.description ?? "")
+                            .padding()
+                    }
+                    .glassBackgroundEffect(displayMode: .always)
                     
-                    Text(viewModel.item.description ?? "")
-                        .padding()
-                }
-                .glassBackgroundEffect(displayMode: .always)
+                    RealityView { content in
+                        do {
+                            entity = try await Entity(named: viewModel.item.name)
+                            selectedEntity = entity
+                            guard let entity else { return }
+                            entity.generateCollisionShapes(recursive: true)
+                            entity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                            content.add(entity)
+                            debugPrint("BODY SIZE: \(proxy.size)")
+                        } catch {
+                            debugPrint(error)
+                        }
 
-                RealityView { content in
-                    do {
-                        entity = try await Entity(named: viewModel.item.name)
-                        selectedEntity = entity
-                        guard let entity else { return }
-                        entity.generateCollisionShapes(recursive: true)
-                        entity.components.set(InputTargetComponent(allowedInputTypes: .all))
-                        content.add(entity)
-                    } catch {
-                        debugPrint(error)
+                    } update: { content in
+                        guard let selectedEntity, selectedEntity != entity else {
+                            content.entities.removeAll()
+                            guard let entity else { return }
+                            content.add(entity)
+                            entity.isEnabled = true
+                            debugPrint("ENTITY SIZE: \(entity.visualBounds(relativeTo: nil))")
+                            return
+                        }
+                        selectedEntity.generateCollisionShapes(recursive: true)
+                        selectedEntity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                        content.add(selectedEntity)
+                        entity?.isEnabled = false
+                        debugPrint("ENTITY SIZE: \(selectedEntity.visualBounds(relativeTo: nil))")
                     }
-
-                } update: { content in
-                    guard let selectedEntity, selectedEntity != entity else {
-                        content.entities.removeAll()
-                        guard let entity else { return }
-                        content.add(entity)
-                        entity.isEnabled = true
-                        return
-                    }
-                    selectedEntity.generateCollisionShapes(recursive: true)
-                    selectedEntity.components.set(InputTargetComponent(allowedInputTypes: .all))
-                    content.add(selectedEntity)
-                    entity?.isEnabled = false
-                }
-                .rotation3DEffect(angle, axis: axis)
-                .scaleEffect(scale)
-                .simultaneousGesture(
-                    DragGesture()
-                        .onChanged { value in
-                            if let startAngle, let startAxis {
-                                let _angle = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2)) + startAngle.degrees
-                                let axisX = ((-value.translation.height + startAxis.0) / CGFloat(_angle))
-                                let axisY = ((-value.translation.width + startAxis.1) / CGFloat(_angle))
-                                angle = Angle(degrees: Double(_angle))
-                                axis = (axisX, axisY, 0)
-                            } else {
+                    .rotation3DEffect(angle, axis: axis)
+                    .scaleEffect(scale)
+                    .simultaneousGesture(
+                        DragGesture()
+                            .onChanged { value in
+                                if let startAngle, let startAxis {
+                                    let _angle = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2)) + startAngle.degrees
+                                    let axisX = ((-value.translation.height + startAxis.0) / CGFloat(_angle))
+                                    let axisY = ((-value.translation.width + startAxis.1) / CGFloat(_angle))
+                                    angle = Angle(degrees: Double(_angle))
+                                    axis = (axisX, axisY, 0)
+                                } else {
+                                    startAngle = angle
+                                    startAxis = axis
+                                }
+                                
+                            }
+                            .onEnded { value in
                                 startAngle = angle
                                 startAxis = axis
+                            })
+                    .simultaneousGesture(
+                        MagnifyGesture()
+                            .targetedToAnyEntity()
+                            .onChanged { value in
+                                if let startScale {
+                                    scale = max(1, min(Constants.maxScale, value.magnification * startScale))
+                                } else {
+                                    startScale = scale
+                                }
                             }
-                            
-                        }
-                        .onEnded { value in
-                            startAngle = angle
-                            startAxis = axis
-                        })
-                .simultaneousGesture(
-                    MagnifyGesture()
-                        .targetedToAnyEntity()
-                        .onChanged { value in
-                            if let startScale {
-                                scale = max(1, min(3, value.magnification * startScale))
-                            } else {
+                            .onEnded { _ in
                                 startScale = scale
                             }
-                        }
-                        .onEnded { _ in
-                            startScale = scale
-                        }
-                )
-                .simultaneousGesture(
-                    TapGesture()
-                        .targetedToAnyEntity()
-                        .onEnded { value in
-                            debugPrint(value.entity)
-                            selectedEntity = value.entity.clone(recursive: true)
-                        }
-                )
+                    )
+                    .simultaneousGesture(
+                        TapGesture()
+                            .targetedToAnyEntity()
+                            .onEnded { value in
+                                debugPrint(value.entity)
+                                selectedEntity = value.entity.clone(recursive: true)
+                                guard let entity else { return }
+                                // Sets the scale of the root entity to the selected entity
+                                selectedEntity?.transform.scale = entity.transform.scale
+                            }
+                    )
+                }
+                
+                Button(action: {
+                    playAnimation()
+                }, label: {
+                    Text("Disassemble")
+                })
+                .disabled(!isAnimationAvailable)
+                
+                Button(action: {
+                    resetAnimation()
+                }, label: {
+                    Text("Assemble")
+                })
+                .disabled(!isAnimationAvailable)
+                
+                Button(action: {
+                    resetScene()
+                }, label: {
+                    Text("Back")
+                })
+                .opacity(isBackAvailable ? 1 : 0)
             }
-            
-            Button(action: {
-                playAnimation()
-            }, label: {
-                Text("Disassemble")
-            })
-            .disabled(!isAnimationAvailable)
-            
-            Button(action: {
-                resetAnimation()
-            }, label: {
-                Text("Assemble")
-            })
-            .disabled(!isAnimationAvailable)
-            
-            Button(action: {
-                resetScene()
-            }, label: {
-                Text("Back")
-            })
-            .disabled(!isBackAvailable)
         }
+        
     }
     
     private func playAnimation() {
