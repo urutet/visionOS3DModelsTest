@@ -64,9 +64,12 @@ struct ItemView: View {
                             selectedEntity = entity
                             guard let entity else { return }
                             entity.generateCollisionShapes(recursive: true)
-                            entity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                            entity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
+                            let children = entity.findChildren(of: viewModel.item.rootName)
+                            children.forEach { child in
+                                child.components.set(HoverEffectComponent())
+                            }
                             content.add(entity)
-                            debugPrint("BODY SIZE: \(proxy.size)")
                         } catch {
                             debugPrint(error)
                         }
@@ -77,14 +80,12 @@ struct ItemView: View {
                             guard let entity else { return }
                             content.add(entity)
                             entity.isEnabled = true
-                            debugPrint("ENTITY SIZE: \(entity.visualBounds(relativeTo: nil))")
                             return
                         }
                         selectedEntity.generateCollisionShapes(recursive: true)
-                        selectedEntity.components.set(InputTargetComponent(allowedInputTypes: .all))
+                        selectedEntity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
                         content.add(selectedEntity)
                         entity?.isEnabled = false
-                        debugPrint("ENTITY SIZE: \(selectedEntity.visualBounds(relativeTo: nil))")
                     }
                     .rotation3DEffect(angle, axis: axis)
                     .scaleEffect(scale)

@@ -21,6 +21,7 @@
 		E846DA3B2BC9300200C217C1 /* DslrCamera.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA382BC9300200C217C1 /* DslrCamera.usdz */; };
 		E846DA3C2BC9300200C217C1 /* MagnifyingGlass.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */; };
 		E846DA422BCD4A7100C217C1 /* Camera.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E846DA412BCD4A7100C217C1 /* Camera.usdz */; };
+		E846DA742BDA46AB00C217C1 /* Entity+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = E846DA732BDA46AB00C217C1 /* Entity+Components.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		E846DA382BC9300200C217C1 /* DslrCamera.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = DslrCamera.usdz; sourceTree = "<group>"; };
 		E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = MagnifyingGlass.usdz; sourceTree = "<group>"; };
 		E846DA412BCD4A7100C217C1 /* Camera.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = Camera.usdz; sourceTree = "<group>"; };
+		E846DA732BDA46AB00C217C1 /* Entity+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+Components.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 		E846DA012BC7CE5E00C217C1 /* visionOS3DModelsTest */ = {
 			isa = PBXGroup;
 			children = (
+				E846DA722BDA469800C217C1 /* Extensions */,
 				E846DA362BC92F0900C217C1 /* USDZ */,
 				E846DA2C2BC9227100C217C1 /* Item */,
 				E846DA1A2BC91AE900C217C1 /* List */,
@@ -138,6 +141,14 @@
 				E846DA392BC9300200C217C1 /* MagnifyingGlass.usdz */,
 			);
 			path = USDZ;
+			sourceTree = "<group>";
+		};
+		E846DA722BDA469800C217C1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				E846DA732BDA46AB00C217C1 /* Entity+Components.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E846DA742BDA46AB00C217C1 /* Entity+Components.swift in Sources */,
 				E846DA1C2BC91AF300C217C1 /* ListViewModel.swift in Sources */,
 				E846DA202BC91C0800C217C1 /* ListItemView.swift in Sources */,
 				E846DA312BC9229100C217C1 /* ItemViewModel.swift in Sources */,
