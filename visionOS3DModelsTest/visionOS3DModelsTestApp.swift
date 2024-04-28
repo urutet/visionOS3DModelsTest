@@ -27,5 +27,6 @@ struct visionOS3DModelsTestApp: App {
             }
         }
         .windowStyle(.plain)
+        .defaultSize(width: 1000, height: 1000)
     }
 }

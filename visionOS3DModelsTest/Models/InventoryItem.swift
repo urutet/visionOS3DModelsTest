@@ -12,4 +12,7 @@ struct InventoryItem: Identifiable, Codable, Hashable {
     var name: String
     var description: String?
     var rootName: String?
+    
+    var partName: [String: String] = [:]
+    var partDescription: [String: String] = [:]
 }

@@ -35,13 +35,13 @@ struct ItemView: View {
     
     @State var selectedEntity: Entity? {
         didSet {
-            isBackAvailable = entity != selectedEntity
+            isEntitySelected = entity != selectedEntity
         }
     }
 
     @State var isAnimationAvailable: Bool = false
     
-    @State var isBackAvailable: Bool = false
+    @State var isEntitySelected: Bool = false
     
     var body: some View {
         // Use GeometryReader3D to get window size and scale entity to avoid clipping
@@ -49,12 +49,19 @@ struct ItemView: View {
             VStack {
                 HStack {
                     VStack {
-                        Text(selectedEntity?.name ?? "")
-                            .font(.largeTitle)
-                            .padding()
-                        
-                        Text(viewModel.item.description ?? "")
-                            .padding()
+                        if isEntitySelected {
+                            Text(viewModel.item.partName[selectedEntity?.name ?? ""] ?? "")
+                                .font(.largeTitle)
+                                .padding()
+                            Text(viewModel.item.partDescription[selectedEntity?.name ?? ""] ?? "")
+                                .padding()
+                        } else {
+                            Text(viewModel.item.name)
+                                .font(.largeTitle)
+                                .padding()
+                            Text(viewModel.item.description ?? "")
+                                .padding()
+                        }
                     }
                     .glassBackgroundEffect(displayMode: .always)
                     
@@ -154,7 +161,7 @@ struct ItemView: View {
                 }, label: {
                     Text("Back")
                 })
-                .opacity(isBackAvailable ? 1 : 0)
+                .opacity(isEntitySelected ? 1 : 0)
             }
         }
         
