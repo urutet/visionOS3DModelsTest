@@ -14,7 +14,7 @@ private enum Constants {
 }
 
 struct ItemView: View {
-    @StateObject var viewModel: ItemViewModel
+    @State var viewModel: ItemViewModel
     
     // Rotations
     
@@ -28,6 +28,7 @@ struct ItemView: View {
     @State var startScale: Double?
     @State var entity: Entity? {
         didSet {
+            debugPrint("entity value : \(entity)")
             guard let entity else { return }
             isAnimationAvailable = !entity.availableAnimations.isEmpty
         }
@@ -82,7 +83,8 @@ struct ItemView: View {
                         }
 
                     } update: { content in
-                        guard let selectedEntity, selectedEntity != entity else {
+                        guard let selectedEntity else { return }
+                        guard selectedEntity != entity else {
                             content.entities.removeAll()
                             guard let entity else { return }
                             content.add(entity)
