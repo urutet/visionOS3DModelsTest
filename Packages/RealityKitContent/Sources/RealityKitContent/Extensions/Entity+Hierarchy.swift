@@ -1,20 +1,13 @@
 //
-//  Entity+Components.swift
-//  visionOS3DModelsTest
+//  Entity+Hierarchy.swift
+//
 //
 //  Created by Ilya Yushkevich on 25/04/2024.
 //
 
-import Foundation
 import RealityKit
 
-extension Entity {
-    func addComponents(_ components: [Component]) {
-        components.forEach { component in
-            self.components.set(component)
-        }
-    }
-    
+public extension Entity {
     func findChildren(entity: Entity? = nil, name: String? = nil) -> [Entity] {
         let target = entity ?? self
         
@@ -44,5 +37,14 @@ extension Entity {
         }
         
         return foundChildren
+    }
+    
+    func findRoot() -> Entity? {
+        guard
+            self.parent != nil,
+            !self.name.isEmpty
+        else { return self }
+        debugPrint(self.name)
+        return self.parent?.findRoot()
     }
 }

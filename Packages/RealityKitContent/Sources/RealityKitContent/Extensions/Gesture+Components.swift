@@ -17,18 +17,20 @@ public extension Gesture where Value == EntityTargetValue<RotateGesture3D.Value>
     /// Connects the gesture input to the `GestureComponent` code.
     func useGestureComponent() -> some Gesture {
         onChanged { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onChanged(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
         .onEnded { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onEnded(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
     }
 }
@@ -41,18 +43,20 @@ public extension Gesture where Value == EntityTargetValue<DragGesture.Value> {
     /// Connects the gesture input to the `GestureComponent` code.
     func useGestureComponent() -> some Gesture {
         onChanged { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onChanged(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
         .onEnded { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onEnded(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
     }
 }
@@ -65,18 +69,20 @@ public extension Gesture where Value == EntityTargetValue<MagnifyGesture.Value> 
     /// Connects the gesture input to the `GestureComponent` code.
     func useGestureComponent() -> some Gesture {
         onChanged { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onChanged(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
         .onEnded { value in
-            guard var gestureComponent = value.entity.gestureComponent else { return }
+            guard let root = value.entity.findRoot() else { return }
+            guard var gestureComponent = root.gestureComponent else { return }
             
             gestureComponent.onEnded(value: value)
             
-            value.entity.components.set(gestureComponent)
+            root.components.set(gestureComponent)
         }
     }
 }

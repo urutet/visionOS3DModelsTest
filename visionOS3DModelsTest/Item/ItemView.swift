@@ -28,7 +28,6 @@ struct ItemView: View {
     @State var startScale: Double?
     @State var entity: Entity? {
         didSet {
-            debugPrint("entity value : \(entity)")
             guard let entity else { return }
             isAnimationAvailable = !entity.availableAnimations.isEmpty
         }
@@ -39,132 +38,90 @@ struct ItemView: View {
             isEntitySelected = entity != selectedEntity
         }
     }
-
+    
     @State var isAnimationAvailable: Bool = false
     
     @State var isEntitySelected: Bool = false
     
     var body: some View {
-        // Use GeometryReader3D to get window size and scale entity to avoid clipping
-        GeometryReader { proxy in
-            VStack {
-                HStack {
-                    VStack {
-                        if isEntitySelected {
-                            Text(viewModel.item.partName[selectedEntity?.name ?? ""] ?? "")
-                                .font(.largeTitle)
-                                .padding()
-                            Text(viewModel.item.partDescription[selectedEntity?.name ?? ""] ?? "")
-                                .padding()
-                        } else {
-                            Text(viewModel.item.name)
-                                .font(.largeTitle)
-                                .padding()
-                            Text(viewModel.item.description ?? "")
-                                .padding()
-                        }
-                    }
-                    .glassBackgroundEffect(displayMode: .always)
+        VStack {
+            HStack {
+                VStack {
+                    Text(selectedEntity?.name ?? "")
+                        .font(.largeTitle)
+                        .padding()
                     
-                    RealityView { content in
-                        do {
-                            entity = try await Entity(named: viewModel.item.name)
-                            selectedEntity = entity
-                            guard let entity else { return }
-                            entity.generateCollisionShapes(recursive: true)
-                            entity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
-                            let children = entity.findChildren(of: viewModel.item.rootName)
-                            children.forEach { child in
-                                child.components.set(HoverEffectComponent())
-                            }
-                            content.add(entity)
-                        } catch {
-                            debugPrint(error)
-                        }
-
-                    } update: { content in
-                        guard let selectedEntity else { return }
-                        guard selectedEntity != entity else {
-                            content.entities.removeAll()
-                            guard let entity else { return }
-                            content.add(entity)
-                            entity.isEnabled = true
-                            return
-                        }
-                        selectedEntity.generateCollisionShapes(recursive: true)
-                        selectedEntity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
-                        content.add(selectedEntity)
-                        entity?.isEnabled = false
-                    }
-                    .rotation3DEffect(angle, axis: axis)
-                    .scaleEffect(scale)
-                    .simultaneousGesture(
-                        DragGesture()
-                            .onChanged { value in
-                                if let startAngle, let startAxis {
-                                    let _angle = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2)) + startAngle.degrees
-                                    let axisX = ((-value.translation.height + startAxis.0) / CGFloat(_angle))
-                                    let axisY = ((-value.translation.width + startAxis.1) / CGFloat(_angle))
-                                    angle = Angle(degrees: Double(_angle))
-                                    axis = (axisX, axisY, 0)
-                                } else {
-                                    startAngle = angle
-                                    startAxis = axis
-                                }
-                                
-                            }
-                            .onEnded { value in
-                                startAngle = angle
-                                startAxis = axis
-                            })
-                    .simultaneousGesture(
-                        MagnifyGesture()
-                            .targetedToAnyEntity()
-                            .onChanged { value in
-                                if let startScale {
-                                    scale = max(1, min(Constants.maxScale, value.magnification * startScale))
-                                } else {
-                                    startScale = scale
-                                }
-                            }
-                            .onEnded { _ in
-                                startScale = scale
-                            }
-                    )
-                    .simultaneousGesture(
-                        TapGesture()
-                            .targetedToAnyEntity()
-                            .onEnded { value in
-                                debugPrint(value.entity)
-                                selectedEntity = value.entity.clone(recursive: true)
-                                guard let entity else { return }
-                                // Sets the scale of the root entity to the selected entity
-                                selectedEntity?.transform.scale = entity.transform.scale
-                            }
-                    )
+                    Text(viewModel.item.description ?? "")
+                        .padding()
                 }
+                .glassBackgroundEffect(displayMode: .always)
                 
-                Button(action: {
-                    playAnimation()
-                }, label: {
-                    Text("Disassemble")
-                })
-                .disabled(!isAnimationAvailable)
-                
-                Button(action: {
-                    resetAnimation()
-                }, label: {
-                    Text("Assemble")
-                })
-                .disabled(!isAnimationAvailable)
-                
-                Button(action: {
-                    resetScene()
-                }, label: {
-                    Text("Back")
-                })
-                .opacity(isEntitySelected ? 1 : 0)
+                RealityView { content in
+                    do {
+                        entity = try await Entity(named: viewModel.item.name)
+                        selectedEntity = entity
+                        guard let entity else { return }
+                        entity.generateCollisionShapes(recursive: true)
+                        entity.addComponents([InputTargetComponent(allowedInputTypes: .all),
+                                              GestureComponent(canDrag: true, canScale: true, canRotate: true)])
+                        let children = entity.findChildren(of: viewModel.item.rootName)
+                        children.forEach { child in
+                            child.components.set(HoverEffectComponent())
+                        }
+                        content.add(entity)
+                    } catch {
+                        debugPrint(error)
+                    }
+                } update: { content in
+                    guard let selectedEntity else { return }
+                    guard selectedEntity != entity else {
+                        content.entities.removeAll()
+                        guard let entity else { return }
+                        content.add(entity)
+                        entity.isEnabled = true
+                        return
+                    }
+                    selectedEntity.generateCollisionShapes(recursive: true)
+                    selectedEntity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
+                    content.add(selectedEntity)
+                    entity?.isEnabled = false
+                }
+                .installGestures()
+                .simultaneousGesture(
+                    TapGesture()
+                        .targetedToAnyEntity()
+                        .onEnded { value in
+                            debugPrint(value.entity)
+                            selectedEntity = value.entity.clone(recursive: true)
+                            guard let entity else { return }
+                            // Sets the scale of the root entity to the selected entity
+                            selectedEntity?.transform.scale = entity.transform.scale
+                            selectedEntity?.transform.rotation = entity.transform.rotation
+                            selectedEntity?.components.set(GestureComponent(canDrag: true, canScale: true, canRotate: true))
+                        }
+                )
             }
+            
+            Button(action: {
+                playAnimation()
+            }, label: {
+                Text("Disassemble")
+            })
+            .disabled(!isAnimationAvailable)
+            
+            Button(action: {
+                resetAnimation()
+            }, label: {
+                Text("Assemble")
+            })
+            .disabled(!isAnimationAvailable)
+            
+            Button(action: {
+                resetScene()
+            }, label: {
+                Text("Back")
+            })
+            .opacity(isEntitySelected ? 1 : 0)
         }
         
     }

@@ -89,8 +89,8 @@ public struct GestureComponent: Component, Codable {
         
         // Only allow a single Entity to be targeted at any given time.
         if state.targetedEntity == nil {
-            state.targetedEntity = value.entity
-            state.initialOrientation = value.entity.orientation(relativeTo: nil)
+            state.targetedEntity = value.entity.findRoot()
+            state.initialOrientation = value.entity.findRoot()?.orientation(relativeTo: nil)
         }
         
         if pivotOnDrag {
@@ -196,7 +196,7 @@ public struct GestureComponent: Component, Codable {
         let state = EntityGestureState.shared
         guard canScale, !state.isDragging else { return }
         
-        let entity = value.entity
+        guard let entity = value.entity.findRoot() else { return }
         
         if !state.isScaling {
             state.isScaling = true
@@ -219,7 +219,7 @@ public struct GestureComponent: Component, Codable {
         let state = EntityGestureState.shared
         guard canRotate, !state.isDragging else { return }
 
-        let entity = value.entity
+        guard let entity = value.entity.findRoot() else { return }
         
         if !state.isRotating {
             state.isRotating = true
