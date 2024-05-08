@@ -78,13 +78,13 @@ struct ItemView: View {
                         content.entities.removeAll()
                         guard let entity else { return }
                         content.add(entity)
-                        entity.isEnabled = true
                         return
                     }
+                    content.entities.removeAll()
                     selectedEntity.generateCollisionShapes(recursive: true)
-                    selectedEntity.addComponents([InputTargetComponent(allowedInputTypes: .all)])
+                    selectedEntity.addComponents([InputTargetComponent(allowedInputTypes: .all),
+                                                  GestureComponent(canDrag: true, canScale: true, canRotate: true)])
                     content.add(selectedEntity)
-                    entity?.isEnabled = false
                 }
                 .installGestures()
                 .simultaneousGesture(
@@ -97,7 +97,6 @@ struct ItemView: View {
                             // Sets the scale of the root entity to the selected entity
                             selectedEntity?.transform.scale = entity.transform.scale
                             selectedEntity?.transform.rotation = entity.transform.rotation
-                            selectedEntity?.components.set(GestureComponent(canDrag: true, canScale: true, canRotate: true))
                         }
                 )
             }

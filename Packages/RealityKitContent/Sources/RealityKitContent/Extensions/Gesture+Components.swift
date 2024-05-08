@@ -70,11 +70,21 @@ public extension Gesture where Value == EntityTargetValue<MagnifyGesture.Value> 
     func useGestureComponent() -> some Gesture {
         onChanged { value in
             guard let root = value.entity.findRoot() else { return }
-            guard var gestureComponent = root.gestureComponent else { return }
+            if var gestureComponent = root.gestureComponent {
+                gestureComponent.onChanged(value: value)
+                
+                root.components.set(gestureComponent)
+                
+                return
+            }
             
-            gestureComponent.onChanged(value: value)
-            
-            root.components.set(gestureComponent)
+            if var gestureComponent = value.entity.gestureComponent {
+                gestureComponent.onChanged(value: value)
+                
+                root.components.set(gestureComponent)
+                
+                return
+            }
         }
         .onEnded { value in
             guard let root = value.entity.findRoot() else { return }
