@@ -47,12 +47,26 @@ struct ItemView: View {
         VStack {
             HStack {
                 VStack {
-                    Text(selectedEntity?.name ?? "")
-                        .font(.largeTitle)
-                        .padding()
+                    if let name = selectedEntity?.name,
+                       let partName = viewModel.item.partName[name] {
+                        Text(partName)
+                            .font(.largeTitle)
+                            .padding()
+                    } else {
+                        Text(viewModel.item.name)
+                            .font(.largeTitle)
+                            .padding()
+                    }
                     
-                    Text(viewModel.item.description ?? "")
-                        .padding()
+                    if let name = selectedEntity?.name,
+                       let description = viewModel.item.partDescription[name] {
+                        Text(description)
+                            .padding()
+                    } else {
+                        Text(viewModel.item.description ?? "")
+                            .padding()
+                    }
+
                 }
                 .glassBackgroundEffect(displayMode: .always)
                 
@@ -70,7 +84,7 @@ struct ItemView: View {
                         }
                         content.add(entity)
                     } catch {
-                        debugPrint(error)
+                        debugPrint("ITEM INIT ERROR: \(error)")
                     }
                 } update: { content in
                     guard let selectedEntity else { return }
